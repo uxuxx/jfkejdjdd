@@ -1,1 +1,130 @@
-<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>uxtchat</title><style>body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fafafa;color:#222;display:flex;flex-direction:column;min-height:100vh;transition:background .3s,color .3s}*{box-sizing:border-box;text-transform:lowercase}a,button,input,textarea{font:inherit;background:#fff;border:1px solid #ddd;padding:10px 14px;border-radius:12px;color:#222;transition:all .2s;outline:none}button{background:#f0f0f0;cursor:pointer;border-color:#ccc;font-weight:500}button:hover{background:#e0e0e0;transform:scale(.97)}.container{max-width:640px;margin:0 auto;padding:20px;flex:1;width:100%}.center{display:flex;flex-direction:column;align-items:center;justify-content:center;height:80vh;gap:12px}.hidden{display:none!important}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.flex{display:flex;flex-direction:column;gap:12px}.chat-list{list-style:none;padding:0;margin:0}.chat-item{padding:14px 16px;border-bottom:1px solid #eee;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-radius:8px;transition:background .15s}.chat-item:hover{background:#f0f0f0}.online{color:#2e7d32}.offline{color:#9e9e9e}.profile-avatar{width:80px;height:80px;border-radius:50%;object-fit:cover;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:500;color:#555}.msg{background:#fff;padding:10px 16px;border-radius:16px;max-width:80%;margin:4px 0;word-wrap:break-word;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:all .2s}.msg-mine{background:#e8e8e8;align-self:flex-end}.msg-time{font-size:11px;color:#999;margin-left:12px;white-space:nowrap}.msg-file{color:#1a73e8;text-decoration:none;border-bottom:1px dashed #1a73e8}.search-input{width:100%;padding:12px;border-radius:20px;border:1px solid #ddd;background:#fff}.typing-indicator{color:#888;font-style:italic;font-size:14px;height:24px;opacity:.8;animation:pulse 1.2s infinite}@keyframes pulse{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}.unread-badge{background:#d32f2f;color:#fff;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin-left:6px}.footer{text-align:center;padding:20px;color:#999;border-top:1px solid #eee;font-size:13px;letter-spacing:.5px}.default-avatar{width:40px;height:40px;border-radius:50%;background:#ccc;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:18px}.dark{background:#1a1a1a;color:#e0e0e0}.dark a,.dark button,.dark input,.dark textarea{background:#2a2a2a;border-color:#444;color:#e0e0e0}.dark button{background:#3a3a3a;border-color:#555}.dark button:hover{background:#4a4a4a}.dark .chat-item{border-bottom-color:#333}.dark .chat-item:hover{background:#2a2a2a}.dark .msg{background:#2a2a2a;box-shadow:0 1px 3px rgba(0,0,0,.4)}.dark .msg-mine{background:#3a3a3a}.dark .footer{border-top-color:#333;color:#777}.dark .profile-avatar{background:#444;color:#ccc}.dark .search-input{background:#2a2a2a;border-color:#444;color:#e0e0e0}.dark .unread-badge{background:#b71c1c}</style></head><body><div id=app class=container><div id=auth class="center"><h2 style=font-weight:300;letter-spacing:1px>uxtchat</h2><input id=loginUser placeholder=username style=width:100%;max-width:280px><input id=loginPass placeholder=password type=password style=width:100%;max-width:280px><div class=row style=justify-content:center><button onclick=login() style=min-width:100px>login</button><button onclick=register() style=min-width:100px>signup</button></div><div id=authMsg style=color:#c62828;font-size:14px></div></div><div id=main class="hidden"><div style=display:flex;gap:8px;margin-bottom:16px><button onclick=showTab('chats') style=flex:1;border-radius:20px>💬 chats</button><button onclick=showTab('profile') style=flex:1;border-radius:20px>👤 profile</button></div><div id=tabChats><input id=searchInput class=search-input placeholder="🔍 search user..." oninput=searchUsers()><ul id=searchResults class=chat-list style=margin-top:8px></ul><hr style=border:none;border-top:1px solid #eee;margin:16px 0><ul id=chatList class=chat-list></ul><div id=chatBox class="hidden flex"><div id=chatHeader style=font-weight:500;font-size:18px;padding:8px 0></div><div id=messages style=display:flex;flex-direction:column;max-height:400px;overflow-y:auto;padding:8px 0;gap:4px></div><div id=typingIndicator class=typing-indicator></div><div class=row><input id=msgInput placeholder="type..." style=flex:1;border-radius:20px><input type=file id=fileInput style=display:none><button onclick="document.getElementById('fileInput').click()" style=border-radius:50%;width:44px;height:44px;padding:0;font-size:20px>📎</button><button onclick=sendMsg() style=border-radius:20px;padding:10px 20px>send</button></div><button onclick=closeChat() style=align-self:flex-start;background:transparent;border:1px solid #ddd;border-radius:20px>← back</button></div></div><div id=tabProfile class="hidden"><div class=flex style=align-items:center><img id=profileAvatar class=profile-avatar><span id=profileNick style=font-size:22px;font-weight:500></span><span id=profileUser style=color:#888;font-size:14px></span><p id=profileBio style=color:#666;font-size:15px;margin:4px 0></p><span id=profileStatus style=font-size:14px></span><div class=row style=justify-content:center><button onclick=toggleTheme() style=border-radius:20px>🌓 theme</button><button id=blockBtn style=display:none;border-radius:20px onclick=blockUser()>block</button></div><button onclick=editProfile() style=border-radius:20px;background:transparent;border:1px solid #ddd>✎ edit</button></div></div></div></div><div class=footer>uxtchat — minimal</div><script>let me=null,currentChat=null,lastTyping=0,currentTheme=localStorage.getItem('uxtchat-theme')||'light';if(currentTheme==='dark')document.body.classList.add('dark');function toggleTheme(){document.body.classList.toggle('dark');currentTheme=document.body.classList.contains('dark')?'dark':'light';localStorage.setItem('uxtchat-theme',currentTheme);}function showTab(t){document.getElementById('tabChats').classList.toggle('hidden',t!=='chats');document.getElementById('tabProfile').classList.toggle('hidden',t!=='profile');if(t==='profile')loadProfile(me);}async function fetchApi(url,opts={}){const h={...opts.headers||{}};if(me)h['X-User-ID']=me;const r=await fetch(url,{...opts,headers:h});if(!r.ok){const t=await r.text();throw new Error(t||r.statusText);}return r.json();}async function login(){const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;try{const d=await fetchApi('/login',{method:'POST',body:new URLSearchParams({username:u,password:p})});me=d.user_id;document.getElementById('auth').classList.add('hidden');document.getElementById('main').classList.remove('hidden');showTab('chats');loadChats();}catch(e){document.getElementById('authMsg').innerText=e.message;}}async function register(){const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;try{await fetchApi('/register',{method:'POST',body:new URLSearchParams({username:u,password:p})});login();}catch(e){document.getElementById('authMsg').innerText=e.message;}}function getAvatarHtml(user){if(user.avatar)return `<img src="/avatars/${user.avatar}" class="default-avatar" style="width:40px;height:40px">`;const initial=(user.nickname||user.username).charAt(0).toUpperCase();return `<span class="default-avatar" style="background:#aaa">${initial}</span>`;}async function searchUsers(){const q=document.getElementById('searchInput').value.trim();if(!q){document.getElementById('searchResults').innerHTML='';return;}const res=await fetchApi('/users?q='+encodeURIComponent(q)+'&me='+me);document.getElementById('searchResults').innerHTML=res.map(u=>`<li class=chat-item onclick="startChat(${u.id})"><span>${getAvatarHtml(u)} ${u.nickname||u.username}</span><span>${u.online?'🟢':'⚪'}</span></li>`).join('');}async function loadChats(){const res=await fetchApi('/chats/'+me);document.getElementById('chatList').innerHTML=res.map(c=>`<li class=chat-item onclick="startChat(${c.user_id})"><span>${getAvatarHtml(c)} ${c.nickname||c.username}</span><span>${c.unread>0?`<span class=unread-badge>${c.unread}</span>`:''} ${c.last_message||''}</span></li>`).join('');}async function startChat(uid){currentChat=uid;document.getElementById('chatBox').classList.remove('hidden');document.getElementById('chatList').style.display='none';document.getElementById('searchResults').style.display='none';const prof=await fetchApi('/profile/'+uid+'?me='+me);document.getElementById('chatHeader').innerHTML=`${prof.nickname||prof.username} ${prof.online?'🟢':'⚪'}`;document.getElementById('blockBtn').style.display=prof.blocked?'inline':'none';document.getElementById('blockBtn').innerText=prof.blocked?'unblock':'block';document.getElementById('blockBtn').dataset.target=uid;loadMessages(uid);}async function loadMessages(uid){const data=await fetchApi(`/messages/${me}/${uid}`);if(data.blocked){document.getElementById('messages').innerHTML='<div style=color:#999;text-align:center;padding:20px>🚫 blocked</div>';document.getElementById('typingIndicator').innerText='';return;}const msgs=data.messages||[];const container=document.getElementById('messages');container.innerHTML=msgs.map(m=>`<div class="msg ${m.from==me?'msg-mine':''}" style="animation:fadeIn .2s">${m.text} ${m.file?`<a href="/uploads/${m.file}" target=_blank class=msg-file>📎</a>`:''}<span class=msg-time>${m.time?new Date(m.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''}</span></div>`).join('');container.scrollTop=container.scrollHeight;document.getElementById('typingIndicator').innerText=data.typing?'✎ typing...':'';}async function sendMsg(){const inp=document.getElementById('msgInput');const text=inp.value.trim();const file=document.getElementById('fileInput').files[0];if(!text&&!file)return;const fd=new FormData();fd.append('from_user',me);fd.append('to_user',currentChat);if(text)fd.append('text',text);if(file)fd.append('file',file);await fetchApi('/message',{method:'POST',body:fd});inp.value='';document.getElementById('fileInput').value='';loadMessages(currentChat);loadChats();}function closeChat(){currentChat=null;document.getElementById('chatBox').classList.add('hidden');document.getElementById('chatList').style.display='';document.getElementById('searchResults').style.display='';}async function loadProfile(uid){const p=await fetchApi('/profile/'+uid+'?me='+me);const avatarEl=document.getElementById('profileAvatar');if(p.avatar){avatarEl.src='/avatars/'+p.avatar;avatarEl.alt='';}else{avatarEl.src='';avatarEl.alt=(p.nickname||p.username).charAt(0).toUpperCase();avatarEl.style.fontSize='32px';avatarEl.style.display='flex';avatarEl.style.alignItems='center';avatarEl.style.justifyContent='center';avatarEl.textContent=avatarEl.alt;}document.getElementById('profileNick').innerText=p.nickname||p.username;document.getElementById('profileUser').innerText='@'+p.username;document.getElementById('profileBio').innerText=p.bio||'';document.getElementById('profileStatus').innerText=p.online?'🟢 online':'⚪ not online';const blockBtn=document.getElementById('blockBtn');if(uid!==me){blockBtn.style.display='inline-block';blockBtn.innerText=p.blocked?'unblock':'block';blockBtn.dataset.target=uid;}else{blockBtn.style.display='none';}}async function blockUser(){const target=parseInt(document.getElementById('blockBtn').dataset.target);const blocked=document.getElementById('blockBtn').innerText==='unblock';const url=blocked?'/block':'/block';const method=blocked?'DELETE':'POST';await fetchApi(url,{method,body:new URLSearchParams({user_id:me,target_id:target})});loadProfile(target);if(currentChat===target){startChat(target);}}function editProfile(){const nick=prompt('nickname:',document.getElementById('profileNick').innerText);if(nick!==null){const bio=prompt('bio:',document.getElementById('profileBio').innerText||'');const fd=new FormData();fd.append('user_id',me);if(nick)fd.append('nickname',nick);if(bio!==null)fd.append('bio',bio);const fileInput=document.createElement('input');fileInput.type='file';fileInput.onchange=async function(){if(this.files[0])fd.append('avatar',this.files[0]);await fetchApi('/profile',{method:'PUT',body:fd});loadProfile(me);};fileInput.click();}}document.getElementById('msgInput').addEventListener('input',function(){if(!currentChat)return;const now=Date.now();if(now-lastTyping>3000){lastTyping=now;fetchApi('/typing',{method:'POST',body:new URLSearchParams({user_id:me,to_user:currentChat})});}});setInterval(function(){if(currentChat)loadMessages(currentChat);if(!document.getElementById('tabChats').classList.contains('hidden'))loadChats();},5000);</script></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>uxtchat</title>
+<style>
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fafafa;color:#222;display:flex;flex-direction:column;min-height:100vh;transition:background .3s,color .3s}
+*{box-sizing:border-box;text-transform:lowercase}
+a,button,input,textarea{font:inherit;background:#fff;border:1px solid #ddd;padding:6px 10px;border-radius:4px;color:#222;transition:all .2s;outline:none}
+button{background:#f0f0f0;cursor:pointer;border-color:#ccc;font-weight:500}
+button:hover{background:#e0e0e0}
+.container{max-width:640px;margin:0 auto;padding:12px;flex:1;width:100%}
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;height:80vh;gap:6px}
+.hidden{display:none!important}
+.row{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.flex{display:flex;flex-direction:column;gap:4px}
+.chat-list{list-style:none;padding:0;margin:0}
+.chat-item{padding:10px 12px;border-bottom:1px solid #eee;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-radius:4px;transition:background .15s}
+.chat-item:hover{background:#f0f0f0}
+.profile-avatar{width:80px;height:80px;object-fit:cover;background:#eee;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:500;color:#555;cursor:pointer;border:1px solid #ddd}
+.msg{background:#fff;padding:8px 14px;border-radius:8px;max-width:80%;margin:2px 0;word-wrap:break-word;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.msg-mine{background:#e8e8e8;align-self:flex-end}
+.msg-time{font-size:10px;color:#999;margin-left:8px;white-space:nowrap}
+.msg-file{color:#1a73e8;text-decoration:none;border-bottom:1px dashed #1a73e8}
+.search-input{width:100%;padding:8px 12px;border:1px solid #ddd;background:#fff;border-radius:4px}
+.typing-indicator{color:#888;font-style:italic;font-size:13px;height:20px;opacity:.8}
+.unread-badge{background:#d32f2f;color:#fff;border-radius:12px;padding:1px 8px;font-size:11px;font-weight:600;margin-left:4px}
+.footer{text-align:center;padding:12px;color:#999;border-top:1px solid #eee;font-size:12px}
+.default-avatar{width:36px;height:36px;background:#ccc;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:16px}
+.dark{background:#1a1a1a;color:#e0e0e0}
+.dark a,.dark button,.dark input,.dark textarea{background:#2a2a2a;border-color:#444;color:#e0e0e0}
+.dark button{background:#3a3a3a;border-color:#555}
+.dark button:hover{background:#4a4a4a}
+.dark .chat-item{border-bottom-color:#333}
+.dark .chat-item:hover{background:#2a2a2a}
+.dark .msg{background:#2a2a2a;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.dark .msg-mine{background:#3a3a3a}
+.dark .footer{border-top-color:#333;color:#777}
+.dark .profile-avatar{background:#444;color:#ccc;border-color:#555}
+.dark .search-input{background:#2a2a2a;border-color:#444;color:#e0e0e0}
+.dark .unread-badge{background:#b71c1c}
+.edit-fields{display:none;gap:4px;margin-top:4px;width:100%}
+.edit-fields input,.edit-fields textarea{width:100%}
+</style>
+</head>
+<body>
+<div id=app class=container>
+<div id=auth class=center>
+<h2 style=font-weight:300;letter-spacing:1px>uxtchat</h2>
+<input id=loginUser placeholder=username style=width:100%;max-width:280px>
+<input id=loginPass placeholder=password type=password style=width:100%;max-width:280px>
+<div class=row style=justify-content:center>
+<button onclick=login() style=min-width:80px>login</button>
+<button onclick=register() style=min-width:80px>signup</button>
+</div>
+<div id=authMsg style=color:#c62828;font-size:13px></div>
+</div>
+<div id=main class=hidden>
+<div style=display:flex;gap:4px;margin-bottom:8px>
+<button onclick=showTab('chats') style=flex:1>chats</button>
+<button onclick=showTab('profile') style=flex:1>profile</button>
+</div>
+<div id=tabChats>
+<input id=searchInput class=search-input placeholder="search" oninput=searchUsers()>
+<ul id=searchResults class=chat-list style=margin-top:6px></ul>
+<hr style=border:none;border-top:1px solid #eee;margin:8px 0>
+<ul id=chatList class=chat-list></ul>
+<div id=chatBox class="hidden flex">
+<div id=chatHeader style=font-weight:500;font-size:17px;padding:4px 0></div>
+<div id=messages style=display:flex;flex-direction:column;max-height:400px;overflow-y:auto;padding:4px 0;gap:2px></div>
+<div id=typingIndicator class=typing-indicator></div>
+<div class=row>
+<input id=msgInput placeholder="type" style=flex:1>
+<input type=file id=fileInput style=display:none>
+<button onclick="document.getElementById('fileInput').click()">file</button>
+<button onclick=sendMsg()>send</button>
+</div>
+<button onclick=closeChat() style=align-self:flex-start;background:transparent;border:1px solid #ddd>back</button>
+</div>
+</div>
+<div id=tabProfile class=hidden>
+<div class=flex style=align-items:center>
+<div class=profile-avatar id=profileAvatar onclick="document.getElementById('avatarInput').click()">?</div>
+<span id=profileNick style=font-size:20px;font-weight:500></span>
+<span id=profileUser style=color:#888;font-size:13px></span>
+<p id=profileBio style=color:#666;font-size:14px;margin:2px 0></p>
+<div class=row style=justify-content:center>
+<button onclick=toggleTheme()>theme</button>
+<button id=blockBtn style=display:none onclick=blockUser()>block</button>
+</div>
+<button onclick=toggleEdit()>edit</button>
+<div id=editFields class=edit-fields>
+<input id=editNick placeholder=nickname>
+<textarea id=editBio placeholder=bio rows=2></textarea>
+<input type=file id=avatarInput accept=image/* style=display:none>
+<div class=row>
+<button onclick=saveProfile()>save</button>
+<button onclick=toggleEdit()>cancel</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class=footer>uxtchat</div>
+<script>
+let me=null,currentChat=null,lastTyping=0,currentTheme=localStorage.getItem('uxtchat-theme')||'light';
+if(currentTheme==='dark')document.body.classList.add('dark');
+function toggleTheme(){document.body.classList.toggle('dark');currentTheme=document.body.classList.contains('dark')?'dark':'light';localStorage.setItem('uxtchat-theme',currentTheme);}
+function toggleEdit(){const f=document.getElementById('editFields');f.style.display=f.style.display==='flex'?'none':'flex';if(f.style.display==='flex'){document.getElementById('editNick').value=document.getElementById('profileNick').innerText;document.getElementById('editBio').value=document.getElementById('profileBio').innerText;}}
+async function saveProfile(){const nick=document.getElementById('editNick').value.trim();const bio=document.getElementById('editBio').value.trim();const fd=new FormData();fd.append('user_id',me);if(nick)fd.append('nickname',nick);fd.append('bio',bio);const fileInput=document.getElementById('avatarInput');if(fileInput.files.length>0)fd.append('avatar',fileInput.files[0]);await fetchApi('/profile',{method:'PUT',body:fd});toggleEdit();loadProfile(me);}
+function showTab(t){document.getElementById('tabChats').classList.toggle('hidden',t!=='chats');document.getElementById('tabProfile').classList.toggle('hidden',t!=='profile');if(t==='profile')loadProfile(me);}
+async function fetchApi(url,opts={}){const h={...opts.headers||{}};if(me)h['X-User-ID']=me;const r=await fetch(url,{...opts,headers:h});if(!r.ok){const t=await r.text();throw new Error(t||r.statusText);}return r.json();}
+async function login(){const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;try{const d=await fetchApi('/login',{method:'POST',body:new URLSearchParams({username:u,password:p})});me=d.user_id;document.getElementById('auth').classList.add('hidden');document.getElementById('main').classList.remove('hidden');showTab('chats');loadChats();}catch(e){document.getElementById('authMsg').innerText=e.message;}}
+async function register(){const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;try{await fetchApi('/register',{method:'POST',body:new URLSearchParams({username:u,password:p})});login();}catch(e){document.getElementById('authMsg').innerText=e.message;}}
+function getAvatarHtml(user){if(user.avatar)return `<img src="/avatars/${user.avatar}" class="default-avatar" style="width:36px;height:36px">`;return `<span class="default-avatar" style="background:#aaa">${(user.nickname||user.username).charAt(0).toUpperCase()}</span>`;}
+async function searchUsers(){const q=document.getElementById('searchInput').value.trim();if(!q){document.getElementById('searchResults').innerHTML='';return;}const res=await fetchApi('/users?q='+encodeURIComponent(q)+'&me='+me);document.getElementById('searchResults').innerHTML=res.map(u=>`<li class=chat-item onclick="startChat(${u.id})"><span>${getAvatarHtml(u)} ${u.nickname||u.username}</span></li>`).join('');}
+async function loadChats(){const res=await fetchApi('/chats/'+me);document.getElementById('chatList').innerHTML=res.map(c=>`<li class=chat-item onclick="startChat(${c.user_id})"><span>${getAvatarHtml(c)} ${c.nickname||c.username}</span><span>${c.unread>0?`<span class=unread-badge>${c.unread}</span>`:''} ${c.last_message||''}</span></li>`).join('');}
+async function startChat(uid){currentChat=uid;document.getElementById('chatBox').classList.remove('hidden');document.getElementById('chatList').style.display='none';document.getElementById('searchResults').style.display='none';const prof=await fetchApi('/profile/'+uid+'?me='+me);document.getElementById('chatHeader').innerText=prof.nickname||prof.username;document.getElementById('blockBtn').style.display=prof.blocked?'inline':'none';document.getElementById('blockBtn').innerText=prof.blocked?'unblock':'block';document.getElementById('blockBtn').dataset.target=uid;loadMessages(uid);}
+async function loadMessages(uid){const data=await fetchApi(`/messages/${me}/${uid}`);if(data.blocked){document.getElementById('messages').innerHTML='<div style=color:#999;text-align:center;padding:20px>blocked</div>';document.getElementById('typingIndicator').innerText='';return;}const msgs=data.messages||[];const container=document.getElementById('messages');container.innerHTML=msgs.map(m=>`<div class="msg ${m.from==me?'msg-mine':''}">${m.text} ${m.file?`<a href="/uploads/${m.file}" target=_blank class=msg-file>file</a>`:''}<span class=msg-time>${m.time?new Date(m.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''}</span></div>`).join('');container.scrollTop=container.scrollHeight;document.getElementById('typingIndicator').innerText=data.typing?'typing...':'';}
+async function sendMsg(){const inp=document.getElementById('msgInput');const text=inp.value.trim();const file=document.getElementById('fileInput').files[0];if(!text&&!file)return;const fd=new FormData();fd.append('from_user',me);fd.append('to_user',currentChat);if(text)fd.append('text',text);if(file)fd.append('file',file);await fetchApi('/message',{method:'POST',body:fd});inp.value='';document.getElementById('fileInput').value='';loadMessages(currentChat);loadChats();}
+function closeChat(){currentChat=null;document.getElementById('chatBox').classList.add('hidden');document.getElementById('chatList').style.display='';document.getElementById('searchResults').style.display='';}
+async function loadProfile(uid){const p=await fetchApi('/profile/'+uid+'?me='+me);const avatarEl=document.getElementById('profileAvatar');if(p.avatar){avatarEl.innerHTML=`<img src="/avatars/${p.avatar}" style="width:100%;height:100%;object-fit:cover">`;}else{avatarEl.innerHTML='?';}document.getElementById('profileNick').innerText=p.nickname||p.username;document.getElementById('profileUser').innerText='@'+p.username;document.getElementById('profileBio').innerText=p.bio||'';const blockBtn=document.getElementById('blockBtn');if(uid!==me){blockBtn.style.display='inline-block';blockBtn.innerText=p.blocked?'unblock':'block';blockBtn.dataset.target=uid;}else{blockBtn.style.display='none';}}
+async function blockUser(){const target=parseInt(document.getElementById('blockBtn').dataset.target);const blocked=document.getElementById('blockBtn').innerText==='unblock';const url=blocked?'/block':'/block';const method=blocked?'DELETE':'POST';await fetchApi(url,{method,body:new URLSearchParams({user_id:me,target_id:target})});loadProfile(target);if(currentChat===target){startChat(target);}}
+document.getElementById('msgInput').addEventListener('input',function(){if(!currentChat)return;const now=Date.now();if(now-lastTyping>3000){lastTyping=now;fetchApi('/typing',{method:'POST',body:new URLSearchParams({user_id:me,to_user:currentChat})});}});
+setInterval(function(){if(currentChat)loadMessages(currentChat);if(!document.getElementById('tabChats').classList.contains('hidden'))loadChats();},5000);
+</script>
+</body>
+</html>
