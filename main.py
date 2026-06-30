@@ -53,6 +53,10 @@ def hash_pw(pw): return hashlib.sha256(pw.encode()).hexdigest()
 
 @app.post("/register")
 async def register(username: str = Form(...), password: str = Form(...)):
+    if len(password) > 30:
+        raise HTTPException(400, "password max 30 chars")
+    if len(username) > 25:
+        raise HTTPException(400, "username max 25 chars")
     conn = sqlite3.connect(DB_PATH)
     try:
         conn.execute("INSERT INTO users (username, password, nickname, last_seen) VALUES (?,?,?,?)",
@@ -87,7 +91,7 @@ async def search_users(q: str, me: int):
         LIMIT 20
     ''', (f"%{q}%", me, me, me)).fetchall()
     conn.close()
-    return [{"id": r[0], "username": r[1], "nickname": r[2], "avatar": r[3], "online": (datetime.utcnow() - datetime.fromisoformat(r[4])).seconds < 60} for r in rows]
+    return [{"id": r[0], "username": r[1], "nickname": r[2], "avatar": r[3]} for r in rows]
 
 @app.get("/profile/{user_id}")
 async def get_profile(user_id: int, me: int = None):
@@ -98,7 +102,7 @@ async def get_profile(user_id: int, me: int = None):
     if me:
         blocked = conn.execute("SELECT 1 FROM blocks WHERE user_id=? AND blocked_user_id=?", (me, user_id)).fetchone() is not None
     conn.close()
-    return {"username": row[0], "nickname": row[1], "avatar": row[2], "bio": row[3], "online": (datetime.utcnow() - datetime.fromisoformat(row[4])).seconds < 60, "blocked": blocked}
+    return {"username": row[0], "nickname": row[1], "avatar": row[2], "bio": row[3], "blocked": blocked}
 
 @app.put("/profile")
 async def update_profile(
@@ -107,6 +111,8 @@ async def update_profile(
     bio: str = Form(None),
     avatar: UploadFile = File(None)
 ):
+    if nickname and len(nickname) > 25:
+        raise HTTPException(400, "nickname max 25 chars")
     conn = sqlite3.connect(DB_PATH)
     updates = []
     params = []
@@ -175,13 +181,11 @@ async def get_chats(user_id: int):
     result = []
     for r in rows:
         other, uname, nn, av, ls, last_text, last_ts, unread = r
-        online = (datetime.utcnow() - datetime.fromisoformat(ls)).seconds < 60 if ls else False
         result.append({
             "user_id": other,
             "username": uname,
             "nickname": nn,
             "avatar": av,
-            "online": online,
             "last_message": last_text or "",
             "last_time": last_ts,
             "unread": unread
