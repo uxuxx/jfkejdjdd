@@ -5,7 +5,6 @@ import sqlite3, hashlib, os, shutil, subprocess
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
-import uvicorn
 
 app = FastAPI()
 DB_PATH = "database.db"
@@ -193,7 +192,6 @@ async def get_chats(user_id: int):
 @app.get("/messages/{user1}/{user2}")
 async def get_messages(user1: int, user2: int):
     conn = sqlite3.connect(DB_PATH)
-    # check block
     if conn.execute("SELECT 1 FROM blocks WHERE (user_id=? AND blocked_user_id=?) OR (user_id=? AND blocked_user_id=?)", (user1, user2, user2, user1)).fetchone():
         conn.close()
         return {"messages": [], "typing": False, "blocked": True}
@@ -269,6 +267,3 @@ def backup():
 sched = BackgroundScheduler()
 sched.add_job(backup, trigger=IntervalTrigger(minutes=5))
 sched.start()
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
